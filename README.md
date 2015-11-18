@@ -1,0 +1,1 @@
+# syakyo_Django_1_8_official_tutorial
