@@ -48,6 +48,7 @@ class QuestionMethodTests(TestCase):
 
 
     # view tests
+    # index
     def test_index_view_with_no_questions(self):
         """
         If no questions exist, an appropriate message should be displayed.
@@ -103,3 +104,31 @@ class QuestionMethodTests(TestCase):
             response.context['latest_question_list'],
             ['<Question: Past question 2.>', '<Question: Past question 1.>']
         )
+
+    # detail
+    def test_detail_view_with_a_future_question(self):
+        """
+        The detail view of a question with a pub_date in the future should
+        return a 404 not found.
+        """
+        future_question = create_question(
+            question_text='Future question.',
+            days=5
+        )
+        response = self.client.get(reverse('polls:detail',
+                                           args=(future_question.id,)))
+        self.assertEqual(response.status_code, 404)
+
+    def test_detail_view_with_a_post_question(self):
+        """
+        The detail view of a question with a pub_date in the past should
+        display the question's text.
+        """
+        post_question = create_question(
+            question_text='Post question.',
+            days=-5
+        )
+        response = self.client.get(reverse('polls:detail',
+                                           args=(post_question.id,)))
+        self.assertContains(response, post_question.question_text,
+                            status_code=200)
